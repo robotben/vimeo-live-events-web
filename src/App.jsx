@@ -19,6 +19,8 @@ const INITIAL_STATE = {
   user: null,
   destinations: [],
   selectedDestinations: [],
+  ottDestinations: [],
+  selectedOttDestinations: [],
   csvEvents: [],
 };
 
@@ -57,9 +59,16 @@ export default function App() {
             {state.step === 2 && (
               <DestinationsStep
                 token={state.token}
+                userId={state.user?.uri?.split('/').pop()}
                 selected={state.selectedDestinations}
                 onSelectionChange={selectedDestinations => update({ selectedDestinations })}
-                onNext={destinations => update({ destinations: destinations ?? state.destinations, step: 3 })}
+                selectedOtt={state.selectedOttDestinations}
+                onOttSelectionChange={selectedOttDestinations => update({ selectedOttDestinations })}
+                onNext={(destinations, ottDestinations) => update({
+                  destinations: destinations ?? state.destinations,
+                  ottDestinations: ottDestinations ?? state.ottDestinations,
+                  step: 3,
+                })}
                 onBack={() => update({ step: 1 })}
               />
             )}
@@ -76,9 +85,12 @@ export default function App() {
             {state.step === 4 && (
               <ResultsStep
                 token={state.token}
+                userId={state.user?.uri?.split('/').pop()}
                 events={state.csvEvents}
                 selectedDestinations={state.selectedDestinations}
                 allDestinations={state.destinations}
+                selectedOttDestinations={state.selectedOttDestinations}
+                allOttDestinations={state.ottDestinations}
                 onReset={reset}
               />
             )}

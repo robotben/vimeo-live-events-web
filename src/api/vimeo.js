@@ -26,7 +26,12 @@ export async function validateToken(token) {
 export async function getDestinations(token) {
   try {
     const data = await vimeoFetch(token, '/me/destinations');
-    return Array.isArray(data.data) ? data.data : [];
+    // Response is keyed by platform: { youtube: { is_connected, destinations: [...] }, ... }
+    return Object.entries(data).flatMap(([service, { is_connected, destinations }]) =>
+      is_connected && Array.isArray(destinations)
+        ? destinations.map(d => ({ service_name: service, ...d }))
+        : []
+    );
   } catch {
     return [];
   }
@@ -55,5 +60,24 @@ export async function addDestinationToEvent(token, liveEventId, destination) {
       ...(destination.stream_url && { stream_url: destination.stream_url }),
       ...(destination.stream_key && { stream_key: destination.stream_key }),
     }),
+  });
+}
+
+export async function getOttDestinations(token, userId) {
+  try {
+    const eventsData = await vimeoFetch(token, '/me/live_events?per_page=1');
+    if (!eventsData.data?.length) return [];
+    const eventId = eventsData.data[0].uri.split('/').pop();
+    const data = await vimeoFetch(token, `/users/${userId}/live_events/${eventId}/ott_destinations`);
+    return Array.isArray(data.data) ? data.data : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function addOttDestinationToEvent(token, userId, liveEventId, destination) {
+  return vimeoFetch(token, `/users/${userId}/live_events/${liveEventId}/ott_destinations`, {
+    method: 'POST',
+    body: JSON.stringify({ destination_id: destination.id ?? destination.uri }),
   });
 }

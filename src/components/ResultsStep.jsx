@@ -3,7 +3,7 @@ import {
   Loader, CheckCircle, AlertCircle, Copy, Check, ExternalLink,
   Download, RotateCcw, Clock,
 } from 'lucide-react';
-import { createLiveEvent, addDestinationToEvent } from '../api/vimeo';
+import { createLiveEvent, addDestinationToEvent, addOttDestinationToEvent } from '../api/vimeo';
 import { exportResultsCSV } from '../utils/csvParser';
 
 function CopyCell({ value }) {
@@ -32,7 +32,7 @@ function StatusBadge({ status }) {
   return null;
 }
 
-export default function ResultsStep({ token, events, selectedDestinations, allDestinations, onReset }) {
+export default function ResultsStep({ token, userId, events, selectedDestinations, allDestinations, selectedOttDestinations, allOttDestinations, onReset }) {
   const [results, setResults] = useState(() =>
     events.map(e => ({ ...e, status: 'pending', eventId: null, managementUrl: '', streamUrl: '', streamKey: '', error: '' }))
   );
@@ -51,6 +51,7 @@ export default function ResultsStep({ token, events, selectedDestinations, allDe
     setStarted(true);
 
     const destObjs = allDestinations.filter(d => selectedDestinations.includes(d.uri));
+    const ottDestObjs = allOttDestinations.filter(d => selectedOttDestinations.includes(d.uri));
 
     async function run() {
       for (let i = 0; i < events.length; i++) {
@@ -67,7 +68,15 @@ export default function ResultsStep({ token, events, selectedDestinations, allDe
             try {
               await addDestinationToEvent(token, eventId, dest);
             } catch {
-              // non-fatal — event is created even if destination linking fails
+              // non-fatal
+            }
+          }
+
+          for (const dest of ottDestObjs) {
+            try {
+              await addOttDestinationToEvent(token, userId, eventId, dest);
+            } catch {
+              // non-fatal
             }
           }
 
@@ -92,7 +101,7 @@ export default function ResultsStep({ token, events, selectedDestinations, allDe
       </h2>
       <p className="step-desc" style={{ marginBottom: 20 }}>
         {!finished
-          ? `Creating ${total} live event${total !== 1 ? 's' : ''}${selectedDestinations.length ? ` and linking ${selectedDestinations.length} destination${selectedDestinations.length !== 1 ? 's' : ''}` : ''}…`
+          ? `Creating ${total} live event${total !== 1 ? 's' : ''}${selectedDestinations.length + selectedOttDestinations.length ? ` and linking ${selectedDestinations.length + selectedOttDestinations.length} destination${selectedDestinations.length + selectedOttDestinations.length !== 1 ? 's' : ''}` : ''}…`
           : 'Stream URLs and keys are below. Copy them into your encoder.'}
       </p>
 
