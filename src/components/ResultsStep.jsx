@@ -60,7 +60,7 @@ export default function ResultsStep({ token, userId, events, selectedDestination
         try {
           const event = await createLiveEvent(token, events[i]);
           const eventId = event.uri?.split('/').pop() || '';
-          const managementUrl = `https://vimeo.com/manage/events/${eventId}`;
+          const managementUrl = `https://vimeo.com/live/rtmp/event/${eventId}`;
           const streamUrl = event.rtmps_link || event.rtmp_link || '';
           const streamKey = event.stream_key || '';
 
