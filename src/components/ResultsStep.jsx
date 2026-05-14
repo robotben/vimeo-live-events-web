@@ -132,6 +132,7 @@ export default function ResultsStep({ token, userId, events, selectedDestination
             <tr>
               <th>Title</th>
               <th>Status</th>
+              <th>Event ID</th>
               <th>Management</th>
               <th>Stream URL</th>
               <th>Stream Key</th>
@@ -143,6 +144,7 @@ export default function ResultsStep({ token, userId, events, selectedDestination
                 <tr key={i}>
                   <td className="cell-title">{r.title}</td>
                   <td><StatusBadge status={r.status} /></td>
+                  <td>{r.eventId ? <CopyCell value={r.eventId} /> : <span style={{ color: 'var(--text-muted)' }}>—</span>}</td>
                   <td className="cell-link">
                     {r.managementUrl
                       ? <a href={r.managementUrl} target="_blank" rel="noopener noreferrer">
@@ -156,7 +158,7 @@ export default function ResultsStep({ token, userId, events, selectedDestination
                 </tr>
                 {r.status === 'error' && r.error && (
                   <tr key={`${i}-error`}>
-                    <td colSpan={5} style={{ padding: '6px 12px 10px', background: 'var(--surface-2)' }}>
+                    <td colSpan={6} style={{ padding: '6px 12px 10px', background: 'var(--surface-2)' }}>
                       <div className="feedback error" style={{ margin: 0, fontSize: 12 }}>
                         <AlertCircle size={13} /> {r.error}
                       </div>

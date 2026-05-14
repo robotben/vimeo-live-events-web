@@ -43,7 +43,7 @@ export async function createLiveEvent(token, { title, description, start_time })
     body: JSON.stringify({
       title,
       stream_title: title,
-      description: description || '',
+      stream_description: description || '',
       ...(start_time ? { schedule: { type: 'single', start_time } } : { type: 'recurring' }),
       privacy: { view: 'anybody', embed: 'public' },
     }),
