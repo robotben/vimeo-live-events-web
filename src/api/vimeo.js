@@ -37,6 +37,7 @@ export async function createLiveEvent(token, { title, description }) {
     method: 'POST',
     body: JSON.stringify({
       title,
+      stream_title: title,
       description: description || '',
       type: 'recurring',
       privacy: { view: 'anybody', embed: 'public' },
