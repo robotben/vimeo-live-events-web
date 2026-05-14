@@ -1,9 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Settings } from 'lucide-react';
 import StepIndicator from './components/StepIndicator';
 import TokenStep from './components/TokenStep';
 import DestinationsStep from './components/DestinationsStep';
 import CsvStep from './components/CsvStep';
 import ResultsStep from './components/ResultsStep';
+import SettingsModal from './components/SettingsModal';
+import { validateToken } from './api/vimeo';
+
+const TOKEN_KEY = 'vimeo_token';
 
 function VimeoIcon() {
   return (
@@ -26,35 +31,77 @@ const INITIAL_STATE = {
 
 export default function App() {
   const [state, setState] = useState(INITIAL_STATE);
+  const [showSettings, setShowSettings] = useState(false);
+  const [autoValidating, setAutoValidating] = useState(false);
 
   function update(patch) {
     setState(s => ({ ...s, ...patch }));
   }
 
   function reset() {
-    setState(INITIAL_STATE);
+    setState(s => ({ ...INITIAL_STATE, token: s.token, user: s.user, step: s.token ? 2 : 1 }));
+  }
+
+  useEffect(() => {
+    const saved = localStorage.getItem(TOKEN_KEY);
+    if (!saved) return;
+    setAutoValidating(true);
+    validateToken(saved)
+      .then(user => update({ token: saved, user, step: 2 }))
+      .catch(() => localStorage.removeItem(TOKEN_KEY))
+      .finally(() => setAutoValidating(false));
+  }, []);
+
+  function handleTokenValidated(token, user) {
+    localStorage.setItem(TOKEN_KEY, token);
+    update({ token, user, step: 2 });
+  }
+
+  function handleSettingsSave(token, user) {
+    localStorage.setItem(TOKEN_KEY, token);
+    update({ token, user, step: 2 });
+    setShowSettings(false);
+  }
+
+  function handleSettingsClear() {
+    localStorage.removeItem(TOKEN_KEY);
+    setState({ ...INITIAL_STATE });
+    setShowSettings(false);
   }
 
   return (
     <div className="app">
       <header className="app-header">
-        <div className="app-logo">
-          <VimeoIcon />
-        </div>
+        <div className="app-logo"><VimeoIcon /></div>
         <span className="app-title">Live Events Creator</span>
         <span className="app-subtitle">Batch creation tool</span>
+        <button className="btn-icon" onClick={() => setShowSettings(true)} title="Settings" style={{ marginLeft: 8 }}>
+          <Settings size={18} />
+        </button>
       </header>
+
+      {showSettings && (
+        <SettingsModal
+          currentToken={state.token}
+          onSave={handleSettingsSave}
+          onClear={handleSettingsClear}
+          onClose={() => setShowSettings(false)}
+        />
+      )}
 
       <main className="app-main">
         <div className="wizard-container">
           <StepIndicator current={state.step} />
 
           <div className="card">
-            {state.step === 1 && (
-              <TokenStep
-                onValidated={(token, user) => update({ token, user, step: 2 })}
-              />
-            )}
+            {autoValidating ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--text-muted)', padding: '32px 0' }}>
+                <span className="spin" style={{ display: 'inline-block', width: 18, height: 18, border: '2px solid var(--border)', borderTopColor: 'var(--accent)', borderRadius: '50%' }} />
+                Signing in…
+              </div>
+            ) : state.step === 1 ? (
+              <TokenStep onValidated={handleTokenValidated} />
+            ) : null}
 
             {state.step === 2 && (
               <DestinationsStep
