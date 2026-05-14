@@ -48,7 +48,7 @@ export default function CsvStep({ events, onEventsChange, onNext, onBack }) {
       <h2 className="step-heading">Upload your event file</h2>
       <p className="step-desc">
         CSV or XLSX file must have a <code style={{ background: 'var(--surface-3)', padding: '2px 6px', borderRadius: 4, fontSize: 13 }}>title</code> column.
-        An optional <code style={{ background: 'var(--surface-3)', padding: '2px 6px', borderRadius: 4, fontSize: 13 }}>description</code> column is also supported.
+        Optional columns: <code style={{ background: 'var(--surface-3)', padding: '2px 6px', borderRadius: 4, fontSize: 13 }}>description</code> and <code style={{ background: 'var(--surface-3)', padding: '2px 6px', borderRadius: 4, fontSize: 13 }}>start_time</code> (ISO 8601, e.g. <code style={{ background: 'var(--surface-3)', padding: '2px 6px', borderRadius: 4, fontSize: 13 }}>2026-06-01T10:00:00+00:00</code>).
       </p>
 
       {!hasEvents ? (
@@ -111,6 +111,7 @@ export default function CsvStep({ events, onEventsChange, onNext, onBack }) {
                   <th>#</th>
                   <th>Title</th>
                   <th>Description</th>
+                  <th>Start Time</th>
                 </tr>
               </thead>
               <tbody>
@@ -119,6 +120,7 @@ export default function CsvStep({ events, onEventsChange, onNext, onBack }) {
                     <td style={{ color: 'var(--text-muted)', width: 40 }}>{i + 1}</td>
                     <td className="cell-title">{e.title}</td>
                     <td className="cell-desc">{e.description || <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>—</span>}</td>
+                    <td className="cell-desc">{e.start_time || <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>—</span>}</td>
                   </tr>
                 ))}
                 {events.length > 10 && (

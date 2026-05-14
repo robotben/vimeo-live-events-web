@@ -10,7 +10,7 @@ function rowsToEvents(rows) {
       const normalised = Object.fromEntries(
         Object.entries(row).map(([k, v]) => [k.toLowerCase().trim(), String(v ?? '').trim()])
       );
-      return { title: normalised.title, description: normalised.description || '' };
+      return { title: normalised.title, description: normalised.description || '', start_time: normalised.start_time || '' };
     })
     .filter(r => r.title);
   if (!events.length) throw new Error('No valid rows found in file');

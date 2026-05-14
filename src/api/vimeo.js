@@ -37,14 +37,14 @@ export async function getDestinations(token) {
   }
 }
 
-export async function createLiveEvent(token, { title, description }) {
+export async function createLiveEvent(token, { title, description, start_time }) {
   return vimeoFetch(token, '/me/live_events', {
     method: 'POST',
     body: JSON.stringify({
       title,
       stream_title: title,
       description: description || '',
-      type: 'recurring',
+      ...(start_time ? { schedule: { start_time } } : { type: 'recurring' }),
       privacy: { view: 'anybody', embed: 'public' },
     }),
   });
