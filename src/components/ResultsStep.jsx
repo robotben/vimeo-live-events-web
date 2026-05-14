@@ -130,22 +130,31 @@ export default function ResultsStep({ token, events, selectedDestinations, allDe
           </thead>
           <tbody>
             {results.map((r, i) => (
-              <tr key={i}>
-                <td className="cell-title">{r.title}</td>
-                <td><StatusBadge status={r.status} /></td>
-                <td className="cell-link">
-                  {r.managementUrl
-                    ? <a href={r.managementUrl} target="_blank" rel="noopener noreferrer">
-                        Open <ExternalLink size={11} style={{ verticalAlign: 'middle' }} />
-                      </a>
-                    : r.status === 'error'
-                      ? <span style={{ color: 'var(--error)', fontSize: 12 }} title={r.error}>Error</span>
+              <>
+                <tr key={i}>
+                  <td className="cell-title">{r.title}</td>
+                  <td><StatusBadge status={r.status} /></td>
+                  <td className="cell-link">
+                    {r.managementUrl
+                      ? <a href={r.managementUrl} target="_blank" rel="noopener noreferrer">
+                          Open <ExternalLink size={11} style={{ verticalAlign: 'middle' }} />
+                        </a>
                       : <span style={{ color: 'var(--text-muted)' }}>—</span>
-                  }
-                </td>
-                <td>{r.streamUrl ? <CopyCell value={r.streamUrl} /> : <span style={{ color: 'var(--text-muted)' }}>—</span>}</td>
-                <td>{r.streamKey ? <CopyCell value={r.streamKey} /> : <span style={{ color: 'var(--text-muted)' }}>—</span>}</td>
-              </tr>
+                    }
+                  </td>
+                  <td>{r.streamUrl ? <CopyCell value={r.streamUrl} /> : <span style={{ color: 'var(--text-muted)' }}>—</span>}</td>
+                  <td>{r.streamKey ? <CopyCell value={r.streamKey} /> : <span style={{ color: 'var(--text-muted)' }}>—</span>}</td>
+                </tr>
+                {r.status === 'error' && r.error && (
+                  <tr key={`${i}-error`}>
+                    <td colSpan={5} style={{ padding: '6px 12px 10px', background: 'var(--surface-2)' }}>
+                      <div className="feedback error" style={{ margin: 0, fontSize: 12 }}>
+                        <AlertCircle size={13} /> {r.error}
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </>
             ))}
           </tbody>
         </table>

@@ -11,7 +11,7 @@ function headers(token) {
 async function vimeoFetch(token, path, options = {}) {
   const res = await fetch(`${BASE}${path}`, { headers: headers(token), ...options });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || data.developer_message || `Request failed (${res.status})`);
+  if (!res.ok) throw new Error(`${data.developer_message || data.error || 'Request failed'} (HTTP ${res.status})`);
   return data;
 }
 
