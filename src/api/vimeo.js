@@ -78,6 +78,6 @@ export async function getOttDestinations(token, userId) {
 export async function addOttDestinationToEvent(token, userId, liveEventId, destination) {
   return vimeoFetch(token, `/users/${userId}/live_events/${liveEventId}/ott_destinations`, {
     method: 'POST',
-    body: JSON.stringify({ destination_id: destination.id ?? destination.uri }),
+    body: JSON.stringify({ id: Number(destination.uri.split('/').pop()) }),
   });
 }
