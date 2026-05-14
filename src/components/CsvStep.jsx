@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import { Upload, FileText, X, ArrowRight, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
-import { parseCSV } from '../utils/csvParser';
+import { parseCSV, parseXLSX } from '../utils/csvParser';
 
 export default function CsvStep({ events, onEventsChange, onNext, onBack }) {
   const [dragging, setDragging] = useState(false);
@@ -10,14 +10,16 @@ export default function CsvStep({ events, onEventsChange, onNext, onBack }) {
 
   const handleFile = useCallback(async (file) => {
     if (!file) return;
-    if (!file.name.endsWith('.csv')) {
-      setError('Please upload a .csv file');
+    const isCSV = file.name.endsWith('.csv');
+    const isXLSX = file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
+    if (!isCSV && !isXLSX) {
+      setError('Please upload a .csv or .xlsx file');
       onEventsChange([]);
       return;
     }
     setError('');
     try {
-      const parsed = await parseCSV(file);
+      const parsed = isXLSX ? await parseXLSX(file) : await parseCSV(file);
       setFileName(file.name);
       onEventsChange(parsed);
     } catch (err) {
@@ -43,9 +45,9 @@ export default function CsvStep({ events, onEventsChange, onNext, onBack }) {
 
   return (
     <>
-      <h2 className="step-heading">Upload your event CSV</h2>
+      <h2 className="step-heading">Upload your event file</h2>
       <p className="step-desc">
-        CSV must have a <code style={{ background: 'var(--surface-3)', padding: '2px 6px', borderRadius: 4, fontSize: 13 }}>title</code> column.
+        CSV or XLSX file must have a <code style={{ background: 'var(--surface-3)', padding: '2px 6px', borderRadius: 4, fontSize: 13 }}>title</code> column.
         An optional <code style={{ background: 'var(--surface-3)', padding: '2px 6px', borderRadius: 4, fontSize: 13 }}>description</code> column is also supported.
       </p>
 
@@ -60,12 +62,12 @@ export default function CsvStep({ events, onEventsChange, onNext, onBack }) {
           <div className="drop-zone-icon">
             <Upload size={32} />
           </div>
-          <h3>{dragging ? 'Drop it!' : 'Drag & drop your CSV'}</h3>
+          <h3>{dragging ? 'Drop it!' : 'Drag & drop your CSV or XLSX'}</h3>
           <p>or click to browse files</p>
           <input
             ref={inputRef}
             type="file"
-            accept=".csv"
+            accept=".csv,.xlsx,.xls"
             onChange={e => handleFile(e.target.files[0])}
           />
         </div>
@@ -79,7 +81,7 @@ export default function CsvStep({ events, onEventsChange, onNext, onBack }) {
           <input
             ref={inputRef}
             type="file"
-            accept=".csv"
+            accept=".csv,.xlsx,.xls"
             onChange={e => handleFile(e.target.files[0])}
           />
         </div>
