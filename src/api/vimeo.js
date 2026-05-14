@@ -44,7 +44,7 @@ export async function createLiveEvent(token, { title, description, start_time })
       title,
       stream_title: title,
       description: description || '',
-      ...(start_time ? { schedule: { start_time } } : { type: 'recurring' }),
+      ...(start_time ? { schedule: { type: 'single', start_time } } : { type: 'recurring' }),
       privacy: { view: 'anybody', embed: 'public' },
     }),
   });
