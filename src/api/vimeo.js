@@ -11,7 +11,11 @@ function headers(token) {
 async function vimeoFetch(token, path, options = {}) {
   const res = await fetch(`${BASE}${path}`, { headers: headers(token), ...options });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(`${data.developer_message || data.error || 'Request failed'} (HTTP ${res.status})`);
+  if (!res.ok) {
+    const base = data.developer_message || data.error || 'Request failed';
+    const invalid = data.invalid_parameters?.map(p => `${p.field}: ${p.developer_message || p.error}`).join('; ');
+    throw new Error(invalid ? `${base} — ${invalid} (HTTP ${res.status})` : `${base} (HTTP ${res.status})`);
+  }
   return data;
 }
 
