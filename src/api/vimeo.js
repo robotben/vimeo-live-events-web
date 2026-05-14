@@ -65,11 +65,10 @@ export async function addDestinationToEvent(token, liveEventId, destination) {
 
 export async function getOttDestinations(token, userId) {
   try {
-    const eventsData = await vimeoFetch(token, '/me/live_events?per_page=1');
-    if (!eventsData.data?.length) return [];
-    const eventId = eventsData.data[0].uri.split('/').pop();
-    const data = await vimeoFetch(token, `/users/${userId}/live_events/${eventId}/ott_destinations`);
-    return Array.isArray(data.data) ? data.data : [];
+    const data = await vimeoFetch(token, `/users/${userId}/ott/channels?fields=id,title`);
+    return Array.isArray(data.data)
+      ? data.data.map(ch => ({ uri: `/ott/channels/${ch.id}`, id: ch.id, display_name: ch.title }))
+      : [];
   } catch {
     return [];
   }
@@ -78,6 +77,6 @@ export async function getOttDestinations(token, userId) {
 export async function addOttDestinationToEvent(token, userId, liveEventId, destination) {
   return vimeoFetch(token, `/users/${userId}/live_events/${liveEventId}/ott_destinations`, {
     method: 'POST',
-    body: JSON.stringify({ id: Number(destination.uri.split('/').pop()) }),
+    body: JSON.stringify({ id: destination.id }),
   });
 }
