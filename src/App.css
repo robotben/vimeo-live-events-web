@@ -46,6 +46,12 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  -webkit-app-region: drag;
+}
+
+.app-header button,
+.app-header a {
+  -webkit-app-region: no-drag;
 }
 
 .app-logo {
