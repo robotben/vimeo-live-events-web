@@ -31,11 +31,13 @@
     "productName": "Live Events Creator",
     "mac": {
       "category": "public.app-category.productivity",
-      "target": "dmg"
+      "target": "dmg",
+      "icon": "assets/icon.icns"
     },
     "files": [
       "dist/**/*",
-      "electron/main.cjs"
+      "electron/main.cjs",
+      "assets/icon.icns"
     ],
     "directories": {
       "output": "release"
